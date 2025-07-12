@@ -1,1 +1,462 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>НДС Калькулятор - Apple Style</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        * {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        
+        .apple-shadow {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+        }
+        
+        .apple-shadow-lg {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        
+        .apple-button {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .apple-button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        
+        .apple-button:active {
+            transform: translateY(0);
+        }
+        
+        .apple-input {
+            transition: all 0.2s ease;
+        }
+        
+        .apple-input:focus {
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .slide-in {
+            animation: slideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        .custom-rate-input {
+            opacity: 0;
+            max-height: 0;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .custom-rate-input.show {
+            opacity: 1;
+            max-height: 80px;
+            margin-top: 12px;
+        }
+        
+        .result-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .glass-effect {
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.9);
+        }
+        
+        .number-animation {
+            transition: all 0.3s ease;
+        }
+        
+        .bounce-in {
+            animation: bounceIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+        
+        @keyframes bounceIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            50% { transform: scale(1.05); opacity: 0.8; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <div class="container mx-auto px-4 py-8 max-w-4xl">
+        <!-- Header -->
+        <div class="text-center mb-8 fade-in">
+            <div class="inline-flex items-center justify-center w-16 h-16 bg-blue-500 rounded-full mb-4 apple-shadow">
+                <i class="fas fa-calculator text-white text-2xl"></i>
+            </div>
+            <h1 class="text-3xl font-bold text-gray-800 mb-2">НДС Калькулятор</h1>
+            <p class="text-gray-600">Элегантный расчет налога на добавленную стоимость</p>
+        </div>
 
+        <!-- Main Calculator -->
+        <div class="bg-white rounded-2xl apple-shadow-lg p-8 mb-8 fade-in">
+            <div class="grid md:grid-cols-2 gap-8">
+                <!-- Input Section -->
+                <div class="space-y-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            <i class="fas fa-money-bill-wave text-blue-500 mr-2"></i>
+                            Сумма
+                        </label>
+                        <div class="relative">
+                            <input 
+                                type="number" 
+                                id="amount" 
+                                class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent apple-input text-lg"
+                                placeholder="Введите сумму"
+                                step="0.01"
+                            >
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            <i class="fas fa-coins text-green-500 mr-2"></i>
+                            Валюта
+                        </label>
+                        <div class="grid grid-cols-2 gap-2">
+                            <button 
+                                class="currency-btn apple-button px-4 py-2 rounded-lg font-medium transition-all bg-blue-500 text-white"
+                                data-currency="₸"
+                            >
+                                ₸ Тенге
+                            </button>
+                            <button 
+                                class="currency-btn apple-button px-4 py-2 rounded-lg font-medium transition-all bg-gray-200 text-gray-700"
+                                data-currency="₽"
+                            >
+                                ₽ Рубли
+                            </button>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            <i class="fas fa-percentage text-purple-500 mr-2"></i>
+                            Ставка НДС
+                        </label>
+                        <div class="grid grid-cols-3 gap-2 mb-2">
+                            <button 
+                                class="rate-btn apple-button px-3 py-2 rounded-lg font-medium transition-all bg-blue-500 text-white"
+                                data-rate="12"
+                            >
+                                12%
+                            </button>
+                            <button 
+                                class="rate-btn apple-button px-3 py-2 rounded-lg font-medium transition-all bg-gray-200 text-gray-700"
+                                data-rate="20"
+                            >
+                                20%
+                            </button>
+                            <button 
+                                class="rate-btn apple-button px-3 py-2 rounded-lg font-medium transition-all bg-gray-200 text-gray-700"
+                                data-rate="custom"
+                            >
+                                Своя
+                            </button>
+                        </div>
+                        <div class="custom-rate-input" id="customRateInput">
+                            <input 
+                                type="number" 
+                                id="customRate" 
+                                class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent apple-input"
+                                placeholder="Введите ставку НДС (%)"
+                                step="0.01"
+                                min="0"
+                                max="100"
+                            >
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            <i class="fas fa-cogs text-orange-500 mr-2"></i>
+                            Операция
+                        </label>
+                        <div class="space-y-2">
+                            <button 
+                                class="operation-btn apple-button w-full px-4 py-3 rounded-lg font-medium transition-all bg-blue-500 text-white text-left"
+                                data-operation="extract"
+                            >
+                                <i class="fas fa-arrow-left mr-2"></i>
+                                Выделить НДС
+                            </button>
+                            <button 
+                                class="operation-btn apple-button w-full px-4 py-3 rounded-lg font-medium transition-all bg-gray-200 text-gray-700 text-left"
+                                data-operation="add"
+                            >
+                                <i class="fas fa-plus mr-2"></i>
+                                Начислить НДС
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Results Section -->
+                <div class="space-y-6">
+                    <div class="result-card rounded-xl p-6 apple-shadow">
+                        <h3 class="text-lg font-semibold mb-4 flex items-center">
+                            <i class="fas fa-chart-line mr-2"></i>
+                            Результат расчета
+                        </h3>
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm opacity-90">Сумма без НДС:</span>
+                                <span class="font-semibold text-lg number-animation" id="amountWithoutVAT">0 ₸</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm opacity-90">Сумма НДС:</span>
+                                <span class="font-semibold text-lg number-animation" id="vatAmount">0 ₸</span>
+                            </div>
+                            <div class="border-t border-white/20 pt-3">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-sm opacity-90">Общая сумма:</span>
+                                    <span class="font-bold text-xl number-animation" id="totalAmount">0 ₸</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-blue-50 rounded-xl p-4 apple-shadow">
+                        <h4 class="font-medium text-blue-800 mb-2 flex items-center">
+                            <i class="fas fa-lightbulb mr-2"></i>
+                            Формула расчета
+                        </h4>
+                        <p class="text-sm text-blue-700" id="formula">
+                            Выберите операцию для отображения формулы
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Information Section -->
+        <div class="grid md:grid-cols-2 gap-6 mb-8">
+            <div class="bg-white rounded-xl p-6 apple-shadow slide-in">
+                <h3 class="text-lg font-semibold text-gray-800 mb-3 flex items-center">
+                    <i class="fas fa-info-circle text-blue-500 mr-2"></i>
+                    Как пользоваться
+                </h3>
+                <ul class="space-y-2 text-sm text-gray-600">
+                    <li class="flex items-start">
+                        <i class="fas fa-check text-green-500 mt-1 mr-2"></i>
+                        Введите сумму в поле ввода
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-check text-green-500 mt-1 mr-2"></i>
+                        Выберите валюту (тенге или рубли)
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-check text-green-500 mt-1 mr-2"></i>
+                        Укажите ставку НДС (12%, 20% или свою)
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-check text-green-500 mt-1 mr-2"></i>
+                        Выберите операцию расчета
+                    </li>
+                </ul>
+            </div>
+
+            <div class="bg-white rounded-xl p-6 apple-shadow slide-in">
+                <h3 class="text-lg font-semibold text-gray-800 mb-3 flex items-center">
+                    <i class="fas fa-percentage text-purple-500 mr-2"></i>
+                    Популярные ставки НДС
+                </h3>
+                <div class="space-y-2 text-sm text-gray-600">
+                    <div class="flex justify-between">
+                        <span>Казахстан:</span>
+                        <span class="font-medium">12%</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Россия:</span>
+                        <span class="font-medium">20%</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Беларусь:</span>
+                        <span class="font-medium">20%</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Украина:</span>
+                        <span class="font-medium">20%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="text-center text-gray-500 text-sm">
+            <p>© 2025 НДС Калькулятор. Создано для быстрого и точного расчета НДС.</p>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let currentCurrency = '₸';
+        let currentRate = 12;
+        let currentOperation = 'extract';
+        let isCustomRate = false;
+
+        // DOM elements
+        const amountInput = document.getElementById('amount');
+        const customRateInput = document.getElementById('customRate');
+        const customRateDiv = document.getElementById('customRateInput');
+        const amountWithoutVATEl = document.getElementById('amountWithoutVAT');
+        const vatAmountEl = document.getElementById('vatAmount');
+        const totalAmountEl = document.getElementById('totalAmount');
+        const formulaEl = document.getElementById('formula');
+
+        // Event listeners
+        amountInput.addEventListener('input', calculate);
+        customRateInput.addEventListener('input', calculate);
+
+        // Currency buttons
+        document.querySelectorAll('.currency-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.currency-btn').forEach(b => {
+                    b.classList.remove('bg-blue-500', 'text-white');
+                    b.classList.add('bg-gray-200', 'text-gray-700');
+                });
+                this.classList.add('bg-blue-500', 'text-white');
+                this.classList.remove('bg-gray-200', 'text-gray-700');
+                currentCurrency = this.dataset.currency;
+                calculate();
+            });
+        });
+
+        // Rate buttons
+        document.querySelectorAll('.rate-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.rate-btn').forEach(b => {
+                    b.classList.remove('bg-blue-500', 'text-white');
+                    b.classList.add('bg-gray-200', 'text-gray-700');
+                });
+                this.classList.add('bg-blue-500', 'text-white');
+                this.classList.remove('bg-gray-200', 'text-gray-700');
+                
+                const rate = this.dataset.rate;
+                if (rate === 'custom') {
+                    isCustomRate = true;
+                    customRateDiv.classList.add('show');
+                    customRateInput.focus();
+                } else {
+                    isCustomRate = false;
+                    customRateDiv.classList.remove('show');
+                    currentRate = parseFloat(rate);
+                }
+                calculate();
+            });
+        });
+
+        // Operation buttons
+        document.querySelectorAll('.operation-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.operation-btn').forEach(b => {
+                    b.classList.remove('bg-blue-500', 'text-white');
+                    b.classList.add('bg-gray-200', 'text-gray-700');
+                });
+                this.classList.add('bg-blue-500', 'text-white');
+                this.classList.remove('bg-gray-200', 'text-gray-700');
+                currentOperation = this.dataset.operation;
+                calculate();
+            });
+        });
+
+        // Calculate function
+        function calculate() {
+            const amount = parseFloat(amountInput.value) || 0;
+            
+            if (isCustomRate) {
+                currentRate = parseFloat(customRateInput.value) || 0;
+            }
+
+            if (amount === 0 || currentRate === 0) {
+                updateResults(0, 0, 0);
+                return;
+            }
+
+            let amountWithoutVAT, vatAmount, totalAmount;
+
+            if (currentOperation === 'extract') {
+                // Extract VAT from amount
+                amountWithoutVAT = amount / (1 + currentRate / 100);
+                vatAmount = amount - amountWithoutVAT;
+                totalAmount = amount;
+                
+                formulaEl.innerHTML = `
+                    <strong>Выделение НДС:</strong><br>
+                    Сумма без НДС = ${amount} ÷ (1 + ${currentRate}%) = ${amountWithoutVAT.toFixed(2)}<br>
+                    Сумма НДС = ${amount} - ${amountWithoutVAT.toFixed(2)} = ${vatAmount.toFixed(2)}
+                `;
+            } else {
+                // Add VAT to amount
+                amountWithoutVAT = amount;
+                vatAmount = amount * (currentRate / 100);
+                totalAmount = amount + vatAmount;
+                
+                formulaEl.innerHTML = `
+                    <strong>Начисление НДС:</strong><br>
+                    Сумма НДС = ${amount} × ${currentRate}% = ${vatAmount.toFixed(2)}<br>
+                    Общая сумма = ${amount} + ${vatAmount.toFixed(2)} = ${totalAmount.toFixed(2)}
+                `;
+            }
+
+            updateResults(amountWithoutVAT, vatAmount, totalAmount);
+        }
+
+        // Update results with animation
+        function updateResults(amountWithoutVAT, vatAmount, totalAmount) {
+            const elements = [amountWithoutVATEl, vatAmountEl, totalAmountEl];
+            elements.forEach(el => el.classList.add('bounce-in'));
+            
+            setTimeout(() => {
+                amountWithoutVATEl.textContent = `${formatNumber(amountWithoutVAT)} ${currentCurrency}`;
+                vatAmountEl.textContent = `${formatNumber(vatAmount)} ${currentCurrency}`;
+                totalAmountEl.textContent = `${formatNumber(totalAmount)} ${currentCurrency}`;
+                
+                elements.forEach(el => el.classList.remove('bounce-in'));
+            }, 100);
+        }
+
+        // Format number with thousands separator
+        function formatNumber(num) {
+            return new Intl.NumberFormat('ru-RU', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }).format(num);
+        }
+
+        // Initial calculation
+        calculate();
+    </script>
+</body>
+</html>
+    <script id="html_badge_script1">
+        window.__genspark_remove_badge_link = "https://www.genspark.ai/api/html_badge/" +
+            "remove_badge?token=To%2FBnjzloZ3UfQdcSaYfDph8MqrdavglO9EUMfzI9EsPUNS9S%2Fj36%2FbRyQNklhbK7oPV7oBayrLa0Tmkq65KS%2BCtEFJn3JW%2FnQL3TDjQmVPQ9meQb7ILTWUTS2CTCGo4HjmzKFAjmNbSRmAv%2BEefcvzEF5KKGN6w2QK1ORD5CrfBVMrAEZLfGKIpBjkMduv1T%2FhuRqoQbHE5BtT2DY7pB7xGfx23OHiUs7aDarzcVgbqTk3dImrCSDuuPeP%2B%2FIvVRo%2B31KcApd7C7LulBXFZXoWZmNDLjEqB4Hw%2F99eQULA7am1cDoGuSCE94zL2da22NpDiWTDNeln7JWtkba%2BQVccDyb61vpjncm4FzGZLpfB47OnKEcw%2FliPar1lfJdCRGWw5I1AU9IHSyK46x8I7berYByNbWaGMo0WLu9biQFQwu4QIWwWZdppWj%2BKgaSyRam6Kth8kdU%2B3NZ%2Bbjr5P3w7tE0Aaq8AJX6Qv17YwD3GV1YIf%2B0Bako2haY68D6kL%2BDzlI6DVM%2BN0ap4MvakmrpyC1RPkWETSFdgZdXk2DYc%3D";
+        window.__genspark_locale = "en-US";
+        window.__genspark_token = "To/BnjzloZ3UfQdcSaYfDph8MqrdavglO9EUMfzI9EsPUNS9S/j36/bRyQNklhbK7oPV7oBayrLa0Tmkq65KS+CtEFJn3JW/nQL3TDjQmVPQ9meQb7ILTWUTS2CTCGo4HjmzKFAjmNbSRmAv+EefcvzEF5KKGN6w2QK1ORD5CrfBVMrAEZLfGKIpBjkMduv1T/huRqoQbHE5BtT2DY7pB7xGfx23OHiUs7aDarzcVgbqTk3dImrCSDuuPeP+/IvVRo+31KcApd7C7LulBXFZXoWZmNDLjEqB4Hw/99eQULA7am1cDoGuSCE94zL2da22NpDiWTDNeln7JWtkba+QVccDyb61vpjncm4FzGZLpfB47OnKEcw/liPar1lfJdCRGWw5I1AU9IHSyK46x8I7berYByNbWaGMo0WLu9biQFQwu4QIWwWZdppWj+KgaSyRam6Kth8kdU+3NZ+bjr5P3w7tE0Aaq8AJX6Qv17YwD3GV1YIf+0Bako2haY68D6kL+DzlI6DVM+N0ap4MvakmrpyC1RPkWETSFdgZdXk2DYc=";
+    </script>
+    
+    <script id="html_notice_dialog_script" src="https://www.genspark.ai/notice_dialog.js"></script>
+    
